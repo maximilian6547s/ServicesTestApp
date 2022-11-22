@@ -30,6 +30,7 @@ class MyForegroundService : Service() {
                 delay(1000)
                 log("Timer $i")
             }
+            stopSelf()
         }
 
         //this flag restarts service if system kills him
