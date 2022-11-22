@@ -19,13 +19,20 @@ class MyService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         log("onStartCommand")
+        val start = intent?.getIntExtra(EXTRA_START, 0) ?: 0
         coroutineScope.launch {
-            for (i in 0 until 100) {
+            for (i in start until start + 100) {
                 delay(1000)
                 log("Timer $i")
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+
+        //this flag restarts service if system kills him
+//        return START_STICKY
+        //this flag restarts service if system kills him and will redeliver intent if we pass them
+        return START_REDELIVER_INTENT
+//this flag DOES NOT restarts service if system kills him
+//        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
@@ -38,14 +45,17 @@ class MyService : Service() {
         TODO("Not yet implemented")
     }
 
-    private fun log(message:String) {
+    private fun log(message: String) {
         Log.d("SERVICE_TAG", "MyService: $message")
     }
 
     companion object {
 
-        fun newIntent(context: Context):Intent {
-            return Intent(context, MyService::class.java)
+        private const val EXTRA_START = "start"
+        fun newIntent(context: Context, start: Int): Intent {
+            return Intent(context, MyService::class.java).apply {
+                putExtra(EXTRA_START, start)
+            }
         }
     }
 }
